@@ -242,7 +242,7 @@ export default function Payments() {
                   >
                     <div className="col-span-1 text-center">
                       <span className="inline-flex items-center justify-center bg-white rounded-xl px-3 py-1 text-[#3A3A3A] font-medium">
-                        {b.room?.RoomID || "-"}{/* ปรับตาม structure */}
+                        {b.room.roomName || "-"}{/* ปรับตาม structure */}
                       </span>
                     </div>
 
