@@ -31,6 +31,7 @@
     "express": "^5.1.0",
     "morgan": "^1.10.1",
     "nodemon": "^3.1.10",
+    "omise": "^1.0.0",
     "postgres": "^3.4.7"
   },
   "devDependencies": {

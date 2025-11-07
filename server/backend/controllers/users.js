@@ -47,11 +47,11 @@ export const getUserById = async (req, res) => {
 // POST create user
 export const createUser = async (req, res) => {
   try {
-    const { authId, FName, LName, Name, email, phone, role } = req.body;
+    const { authId, FName, LName, Gmail, phone, role } = req.body;
 
-    if (!authId || !FName || !LName || !Name || !email) {
+    if (!authId || !FName || !LName || !Gmail) {
       return res.status(400).json({ 
-        error: 'authId, FName, LName, Name, and email are required' 
+        error: 'authId, FName, LName, and Gmail are required' 
       });
     }
 
@@ -60,8 +60,7 @@ export const createUser = async (req, res) => {
         authId,
         FName,
         LName,
-        Name,
-        email,
+        Gmail,
         phone,
         role: role || 'TENANT'
       }
