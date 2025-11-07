@@ -10,52 +10,52 @@ import { getItems as getAllItems } from "../../api/item";
 import { getAllInvoices } from "../../api/invoice"
 
 // Component สำหรับ input รายการ invoice
-const InvoiceInput = ({ index, item, onUpdate, onDelete }) => {
-  const handleChange = (field, value) => onUpdate(index, field, value);
+const InvoiceInput = ({ index, item, onUpdate, onDelete }) => { 
+    const handleChange = (field, value) => onUpdate(index, field, value);
 
-  return (
-    <div className="space-y-1">
-      <div className="flex justify-between items-center">
-        <input
-          type="text"
-          value={item.label}
-          onChange={(e) => handleChange("label", e.target.value)}
-          className="flex-1 text-gray-700 text-sm font-medium border-gray-400 focus:border-solid focus:border-indigo-400 outline-none mr-4 bg-transparent"
-        />
-        {index >= 3 && (
-          <button
-            onClick={() => onDelete(item.id)}
-            className="text-xs text-red-500 hover:text-red-700 font-medium p-1 leading-none transition"
-            aria-label="ลบรายการ"
-          >
-            ลบ
-          </button>
-        )}
-      </div>
-      <div className="flex gap-4">
-        <div className="flex-1 space-y-1">
-          <input
-            type="number"
-            placeholder="0"
-            value={item.quantity}
-            onChange={(e) => handleChange("quantity", e.target.value)}
-            className="w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400"
-          />
-          <div className="text-xs text-gray-500">จำนวน</div>
+    return (
+        <div className="space-y-1">
+            <div className="flex justify-between items-center">
+                <input
+                    type="text"
+                    value={item.label}
+                    onChange={(e) => handleChange("label", e.target.value)}
+                    className="flex-1 text-gray-700 text-sm font-medium border-gray-400 focus:border-solid focus:border-indigo-400 outline-none mr-4 bg-transparent"
+                />
+                {index >= 3 && (
+                <button
+                    onClick={() => onDelete(item.id)}
+                    className="text-xs text-red-500 hover:text-red-700 font-medium p-1 leading-none transition"
+                    aria-label="ลบรายการ"
+                >
+                    ลบ
+                </button>
+                )}
+            </div>
+            <div className="flex gap-4">
+                <div className="flex-1 space-y-1">
+                    <input
+                        type="number"
+                        placeholder="0"
+                        value={item.quantity}
+                        onChange={(e) => handleChange("quantity", e.target.value)}
+                        className="w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400"
+                    />
+                    <div className="text-xs text-gray-500">จำนวน</div>
+                </div>
+                <div className="flex-1 space-y-1">
+                    <input
+                        type="number"
+                        placeholder="0.00"
+                        value={item.price}
+                        onChange={(e) => handleChange("price", e.target.value)}
+                        className="w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400"
+                    />
+                    <div className="text-xs text-gray-500">ราคาต่อหน่วย</div>
+                </div>
+            </div>
         </div>
-        <div className="flex-1 space-y-1">
-          <input
-            type="number"
-            placeholder="0.00"
-            value={item.price}
-            onChange={(e) => handleChange("price", e.target.value)}
-            className="w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400"
-          />
-          <div className="text-xs text-gray-500">ราคาต่อหน่วย</div>
-        </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default function CreateInvoice() {
@@ -186,7 +186,16 @@ export default function CreateInvoice() {
                         <div className="flex flex-col">
                         <div className="text-xl font-semibold">{tenantData.name}</div>
                         <div className="text-sm">
-                            หมดสัญญา <span className="font-medium ml-1">{tenantData.contract}</span>
+                        หมดสัญญา{" "}
+                        <span className="font-medium ml-1">
+                            {tenantData.contracts?.[0]?.DayEnd
+                            ? new Date(tenantData.contracts[0].DayEnd).toLocaleDateString("th-TH", {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                                })
+                            : "ไม่มีข้อมูล"}
+                        </span>
                         </div>
                     </div>
                 </div>
@@ -232,7 +241,7 @@ export default function CreateInvoice() {
                                 
                         <div className="text-sm text-gray-600 font-serif">
                             <span className="font-bold">ผู้อยู่อาศัย :</span>
-                            <span className="font-serif ml-1">{tenantData.name}</span>
+                            <span className="font-serif ml-1">{tenantData.Name} {tenantData.FName} {tenantData.LName} </span>
                         </div>
                     </div>
                             

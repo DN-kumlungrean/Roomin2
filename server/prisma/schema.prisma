@@ -48,6 +48,7 @@ model Building {
 
 model Room {
   RoomID     Int        @id @default(autoincrement())
+  roomName   String?
   price      Float
   statusId   Int
   buildingId Int
