@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Box from "../../components/Box";
 import ButtonRI from "../../components/ButtonRI";
-import { getTenantByAuthId } from "../../api/user";
+import { getMyProfile } from "../../api/user";
 import CalendarBox from "../../components/CalendarBox"
 
 export default function DashboardTenant() {
@@ -12,10 +12,12 @@ export default function DashboardTenant() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const data = await getTenantByAuthId();
-        setUser(data);
-      } catch (err) {
-        console.error(err);
+        const profileData = await getMyProfile();
+        setUser(profileData);
+      } catch (error) {
+        console.error("Failed to load dashboard data:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchUser();

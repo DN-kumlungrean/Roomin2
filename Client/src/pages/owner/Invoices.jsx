@@ -4,7 +4,7 @@ import Logo from "/src/components/Logo.jsx";
 import profile from "/src/assets/profile.png";
 import correct from "/src/assets/correct.svg";
 import { createInvoice as createInvoiceApi } from "../../api/invoice";
-import { getTenantByAuthId } from "../../api/user";
+import { getMyProfile } from "../../api/user";
 import { createItem as createItemApi } from "../../api/item";
 import { getItems as getAllItems } from "../../api/item";
 import { getAllInvoices } from "../../api/invoice"
@@ -76,7 +76,7 @@ export default function CreateInvoice() {
     useEffect(() => {
         const fetchTenant = async () => {
         try {
-            const tenant = await getTenantByAuthId();
+            const tenant = await getMyProfile();
             setTenantData(tenant);
         } catch (err) {
             console.error(err);

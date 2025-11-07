@@ -34,7 +34,7 @@ export default function InformOwner() {
       const response = await apiClient.post("/auth/complete-profile", {
         FName: form.firstName,
         LName: form.lastName,
-        Name: form.nickname,
+        promptpay: form.nickname,
         phone: form.phone,
         gender: form.gender,
         creditCard: form.creditCard,
@@ -143,16 +143,16 @@ export default function InformOwner() {
             </div>
           </div>
 
-          {/* ชื่อเล่น */}
+          {/* Promptpay */}
           <div className="mt-6">
-            <label className="block text-[20px] font-[Podkova] mb-1 ml-3 text-black">ชื่อเล่น</label>
+            <label className="block text-[20px] font-[Podkova] mb-1 ml-3 text-black">Promptpay</label>
             <div className="w-full h-[60px] rounded-[19px] border border-black bg-white flex items-center px-6">
               <input
                 name="nickname"
                 value={form.nickname}
                 onChange={handleChange}
                 type="text"
-                placeholder="กรอกชื่อเล่น"
+                placeholder="กรอกPromptpay"
                 className="w-full outline-none border-none text-[18px] md:text-[20px] font-[Playfair_Display] placeholder:text-black/50"
                 required
               />

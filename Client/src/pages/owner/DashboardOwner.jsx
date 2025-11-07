@@ -8,7 +8,7 @@ export default function DashboardOwner() {
   return (
     <div className="space-y-6">
       {/* text */}
-      <span className="text-4xl font-bold mt-8 block ml-12 mr-12">สวัสดี คุณ อิรุมะคุง</span>
+      <span className="text-4xl font-bold mt-8 block ml-12 mr-12">สวัสดี คุณ อิรุมะคุง </span>
       <div className="text-sm md:text-lg mt-[-4px] ml-12 mr-12">คุณสามารถติดตามค่าใช้จ่าย สร้างใบแจ้งค่าห้อง และเข้าถึงข้อมูลสำคัญได้ง่าย ๆ หวังว่าการใช้งาน ROOMIN จะช่วยให้ชีวิตในการจัดการหอพักของคุณราบรื่นขึ้น</div>
 
       {/* กรอบครอบทั้งหมด */}
