@@ -31,6 +31,5 @@ router.get('/auth/check-profile', checkProfile);
 router.get('/auth/complete-profile', showCompleteProfileForm);
 router.post('/auth/complete-profile', handleCompleteProfileSubmit);
 router.get('/auth/dashboard', showDashboard);
-router.post('/auth/logout', handleLogout);
 
 export default router;
