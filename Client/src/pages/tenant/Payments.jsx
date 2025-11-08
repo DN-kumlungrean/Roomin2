@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import PaymentPopup from "../../components/PaymentPopup";
 import arrowSort from "../../assets/arrow-sort.png";
 import { getInvoicesByAuthId } from "../../api/invoice";
+import InvoiceDetailPopup from "../../components/Detail";
+import DownloadNotification from "../../components/noti";
+import Portal from "../../components/Portal";
 
 export default function Payments() {
   const navigate = useNavigate();
@@ -10,6 +13,8 @@ export default function Payments() {
   const [bills, setBills] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedBill, setSelectedBill] = useState(null);
+  const [showDetailPopup, setShowDetailPopup] = useState(false);
+  const [notification, setNotification] = useState({ show: false, message: '' });
 
   useEffect(() => {
     const fetchInvoices = async () => {
@@ -35,6 +40,11 @@ export default function Payments() {
     fetchInvoices();
   }, []);
 
+  const handleDownload = (bill) => {
+    const downloadMessage = `ใบแจ้งหนี้ #${bill.InvoiceID} กำลังถูกดาวน์โหลด...`;
+    setNotification({ show: true, message: downloadMessage });
+  };
+  
   // ✅ ฟังก์ชันกำหนดสถานะและสี
   const getStatusConfig = (statusName) => {
     switch (statusName) {
@@ -68,17 +78,14 @@ export default function Payments() {
   const formatAmount = (n) =>
     n.toLocaleString("th-TH", { minimumFractionDigits: 0 });
 
-  const handleDownload = (bill) => {
-    alert(`ดาวน์โหลดใบแจ้งหนี้: ${bill.InvoiceID}`);
-  };
-
   const handlePay = (bill) => {
     setSelectedBill(bill);
     setShowPopup(true);
   };
-
+    
   const handleDetail = (bill) => {
-    navigate(`/tenant/payments?detail=${bill.InvoiceID}`);
+    setSelectedBill(bill);
+    setShowDetailPopup(true);
   };
 
   const handlePaymentSuccess = (invoiceId, paidAt) => {
@@ -226,6 +233,23 @@ export default function Payments() {
         amount={selectedBill.total}
         invoiceId={selectedBill.InvoiceID}
       />}
+
+      {showDetailPopup && selectedBill && 
+      <InvoiceDetailPopup 
+        invoice={selectedBill}
+        onClose={() => {
+          setShowDetailPopup(false);
+          setSelectedBill(null);
+        }}
+      />} 
+      {notification.show && (
+      <Portal> 
+        <DownloadNotification
+          message={notification.message}
+          onClose={() => setNotification({ show: false, message: '' })}
+        />
+      </Portal>
+    )}
     </div>
   );
 }
