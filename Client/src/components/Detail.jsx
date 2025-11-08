@@ -23,11 +23,11 @@ export default function InvoiceDetailPopup({ invoice, onClose }) {
 
   const getStatusConfig = (statusName) => {
     switch (statusName) {
-      case "Paid":
+      case "Paid" :
         return { text: "ชำระแล้ว", bgColor: "bg-[#97D76C]" };
-      case "Success":
-        return { text: "รอการตรวจสอบ", bgColor: "bg-gray-400" };
       case "Pending":
+        return { text: "ชำระแล้ว", bgColor: "bg-[#97D76C]" };
+      case "Unpaid":
         return { text: "ค้างชำระ", bgColor: "bg-[#F15F5B]" };
       default:
         return { text: "ไม่ทราบสถานะ", bgColor: "bg-gray-300" };

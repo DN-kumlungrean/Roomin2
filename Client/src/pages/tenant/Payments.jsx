@@ -54,13 +54,13 @@ export default function Payments() {
           bgColor: "bg-[#97D76C]",
           isPaid: true
         };
-      case "Success":
-        return {
-          text: "รอการตรวจสอบ",
-          bgColor: "bg-gray-400",
-          isPaid: false
-        };
       case "Pending":
+        return {
+          text: "ชำระแล้ว",
+          bgColor: "bg-[#97D76C]",
+          isPaid: true
+        };
+      case "Unpaid":
         return {
           text: "ค้างชำระ",
           bgColor: "bg-[#F15F5B]",

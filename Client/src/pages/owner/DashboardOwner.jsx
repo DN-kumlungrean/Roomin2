@@ -1,14 +1,50 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import iconLogo from '../../assets/icon-do.svg';
 import graphCircle from '../../assets/graph-do1.svg';
 import graph from '../../assets/graph-do2.svg';
 import buttonSearch from '../../assets/button-search.svg';
 import arrowSort from '../../assets/arrow-sort.png';
+import { getAllRooms } from "../../api/room";
+import { getAdminByAuthId } from '../../api/user';
 
 export default function DashboardOwner() {
+  const [rooms, setRooms] = useState([]); // ✅ state สำหรับเก็บข้อมูลจาก DB
+  const [admin, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchRooms = async () => {
+      try {
+        const profileData = await getAdminByAuthId();
+        setUser(profileData);
+
+        const roomData = await getAllRooms();
+        setRooms(roomData);
+        
+      } catch (error) {
+        console.error("Error fetching room data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRooms();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen text-xl font-semibold">
+        กำลังโหลดข้อมูล...
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* text */}
-      <span className="text-4xl font-bold mt-8 block ml-12 mr-12">สวัสดี คุณ อิรุมะคุง </span>
+      <span className="text-4xl font-bold mt-8 block ml-12 mr-12">สวัสดี คุณ {admin?.FName || "เจ้าของหอพัก"} </span>
       <div className="text-sm md:text-lg mt-[-4px] ml-12 mr-12">คุณสามารถติดตามค่าใช้จ่าย สร้างใบแจ้งค่าห้อง และเข้าถึงข้อมูลสำคัญได้ง่าย ๆ หวังว่าการใช้งาน ROOMIN จะช่วยให้ชีวิตในการจัดการหอพักของคุณราบรื่นขึ้น</div>
 
       {/* กรอบครอบทั้งหมด */}
@@ -21,7 +57,7 @@ export default function DashboardOwner() {
           <section className="bg-[#FFFDFB] lg:w-1/5 ">
             <div className="rounded-xl p-2 bg-[#FFFDFB]">
               <div className="font-semibold">สถานะห้อง</div>
-              <div className="text-sm">ทั้งหมด 40 ห้อง</div>
+              <div className="text-sm">ทั้งหมด {rooms.length} ห้อง</div>
               <div className="flex items-center justify-center mt-4">
                 <img src={graphCircle} alt="graphcircle" className="w-36 h-36 mr-2" />
               </div>
@@ -60,7 +96,7 @@ export default function DashboardOwner() {
                 <span className="text-4xl font-bold text-[#000000]">70,000</span>
               </div>
               <div className="font-semibold">รายรับ</div>
-              <div className="text-sm">ประจำเดือน: กันยายน</div>
+              <div className="text-sm">ประจำเดือน: {new Date().toLocaleString("th-TH", { month: "long" })}</div>
             </div>
             <div className="rounded-xl p-5 bg-[#FFE6C8]">
               <div className="flex items-center justify-between mb-4">
@@ -68,20 +104,20 @@ export default function DashboardOwner() {
                 <span className="text-4xl font-bold text-[#000000]">40,000</span>
               </div>
               <div className="font-semibold">รายจ่าย</div>
-              <div className="text-sm">ประจำเดือน: กันยายน</div>
+              <div className="text-sm">ประจำเดือน: {new Date().toLocaleString("th-TH", { month: "long" })}</div>
             </div>
             <div className="rounded-xl p-5 bg-[#FFE6C8]">
               <div className="flex items-center justify-between mb-4">
                 <img src={iconLogo} alt="logo" className="w-12 h-12 mr-2" />
-                <span className="text-4xl font-bold text-[#000000]">37</span>
+                <span className="text-4xl font-bold text-[#000000]">{rooms.filter((r) => r.statusId === 2).length}</span>
               </div>
               <div className="font-semibold">จำนวนผู้พักอาศัย</div>
-              <div className="text-sm">ประจำเดือน: กันยายน</div>
+              <div className="text-sm">ประจำเดือน:  {new Date().toLocaleString("th-TH", { month: "long" })}</div>
             </div>
             <div className="rounded-xl p-5 bg-[#FFE6C8]">
               <div className="flex items-center justify-between mb-4">
                 <img src={iconLogo} alt="logo" className="w-12 h-12 mr-2" />
-                <span className="text-4xl font-bold text-[#000000]">17</span>
+                <span className="text-4xl font-bold text-[#000000]">{rooms.filter((r) => r.statusId === 3).length}</span>
               </div>
               <div className="font-semibold">จำนวนห้องค้างชำระ</div>
               <div className="text-sm">อัพเดทล่าสุด 10 นาทีที่แล้ว</div>
@@ -144,61 +180,66 @@ export default function DashboardOwner() {
           <span className="text-center">หมดสัญญา</span>
         </div>
 
-        {/* ข้อมูลแต่ละแถว */}
-        <div className="space-y-3 mt-4 min-w-[964px]">
-          {[
-            { room: "1101", names: ["โรเบิร์ต จอห์น"], count: "1", statusroom: "เช่าแล้ว", status: "ค้างชำระ", start: "01/06/2025", end: "31/05/2026" },
-            { room: "1102", names: ["คุราปิก้า โกะเกะ"], count: "1", statusroom: "เช่าแล้ว", status: "ชำระแล้ว", start: "03/06/2025", end: "31/05/2026" },
-            { room: "1103", names: ["โจรเงา มายา", "คุโรโร่ ลูซิเฟอร์"], count: "2", statusroom: "เช่าแล้ว", status: "ชำระแล้ว", start: "04/06/2025", end: "31/05/2026" },
-            { room: "1104", names: null, count: "0", statusroom: "ว่าง", status: null, start: "-", end: "-" },
-            { room: "1105", names: null, count: "0", statusroom: "ว่าง", status: null, start: "-", end: "-" },
-            { room: "1106", names: null, count: "0", statusroom: "ว่าง", status: null, start: "-", end: "-" },
-            { room: "1107", names: null, count: "0", statusroom: "ว่าง", status: null, start: "-", end: "-" },
-            { room: "1108", names: null, count: "0", statusroom: "ว่าง", status: null, start: "-", end: "-" },
-            { room: "1109", names: null, count: "0", statusroom: "ว่าง", status: null, start: "-", end: "-" }
-          ].map((r) => {
-            const count = Array.isArray(r.names) ? r.names.length : 0;
+          {rooms
+            .sort((a, b) => parseInt(a.RoomName) - parseInt(b.RoomName))
+            .map((r) => {
+              const tenants = r.contracts?.map(c => c.user) || [];
+              const count = tenants.length;
             return (
               <div
-                key={r.room}
+                key={r.RoomID}
                 className="border rounded-xl px-5 py-3 bg-[#FFFDFB] flex items-center justify-between text-sm"
               >
                 <div className="grid w-full grid-cols-[70px_1.8fr_80px_180px_180px_140px_140px] items-center gap-4">
-                  <span className="text-center">{r.room}</span>
+                  <span className="text-center">{r.RoomName}</span>
 
-                  {/* ผู้เช่า (คอลัมน์กว้าง ยอมตัดบรรทัด) */}
-                  <div className="text-gray-800 flex flex-col min-w-0  items-center text-center">
-                    {Array.isArray(r.names) && r.names.length ? (
-                      r.names.map((n, i) => <span key={i} className="truncate">{n}</span>)
-                    ) : (
-                      <span className="text-gray-400 italic">ยังไม่มีข้อมูล</span>
-                    )}
-                  </div>
+                {/* ผู้เช่า */}
+                <div className="text-gray-800 flex flex-col min-w-0 items-center text-center">
+                  {tenants.length > 0 ? tenants.map((t, i) => (
+                    <span key={i} className="truncate">{t.FName} {t.LName}</span>
+                  )) : (
+                    <span className="text-gray-400 italic">ยังไม่มีข้อมูล</span>
+                  )}
+                </div>
 
-                  <span className="text-center">
-                    {Array.isArray(r.names) ? r.names.length : 0}
-                  </span>
+                  <span className="text-center">{count}</span>
 
+                  {/* สถานะห้อง */}
                   <span className={`h-8 inline-flex justify-center items-center rounded-full px-3 text-sm
-                    ${r.statusroom === "เช่าแล้ว" ? "bg-[#FEB863]" : "bg-gray-200"}`}>
-                    {r.statusroom}
+                    ${r.statusId === 2 ? "bg-[#FEB863]" : "bg-gray-200"}`}>
+                    {r.statusId === 2  ? "เช่าแล้ว" : "ว่าง"}
                   </span>
-
+                  {/* สถานะผู้เช่า */}
                   <span className={`h-8 inline-flex justify-center items-center rounded-full px-3 text-sm
-                    ${r.status === "ชำระแล้ว" ? "bg-[#97D76C]"
-                      : r.status === "ค้างชำระ" ? "bg-[#F15F5B]"
-                      : !r.status ? "bg-[#FFFDFB]" : "bg-[#FEB863]"}`}>
-                    {r.status}
+                    ${tenants.some(t => t.status === "ค้างชำระ") ? "bg-[#F15F5B]" : tenants.length > 0 ? "bg-[#97D76C]" : "#FFFDFB"}`}>
+                    {tenants.some(t => t.status === "ค้างชำระ") ? "ค้างชำระ" : tenants.length > 0 ? "ชำระแล้ว" : "-"}
                   </span>
 
-                  <span className="text-center text-gray-700">{r.start}</span>
-                  <span className="text-center text-gray-700">{r.end}</span>
+                  {/* วันเริ่ม / สิ้นสุดสัญญา */}
+                  <span className="text-center text-gray-700">
+                    {r.contracts?.[0]?.DayStart
+                      ? new Date(r.contracts[0].DayStart).toLocaleDateString("th-TH", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric"
+                        })
+                      : "-"}
+                  </span>
+
+                  <span className="text-center text-gray-700">
+                    {r.contracts?.[0]?.DayEnd
+                      ? new Date(r.contracts[0].DayEnd).toLocaleDateString("th-TH", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric"
+                        })
+                      : "-"}
+                  </span>
                 </div>
               </div>
             );
           })}
         </div>
       </div>
-    </div>
   );
 }

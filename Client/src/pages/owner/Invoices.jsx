@@ -154,7 +154,7 @@ export default function CreateInvoice() {
         Date: new Date().toISOString(),
         userId: tenantData.UserID || tenantData.id,
         roomId: tenantData.contracts[0].roomId,
-        statusId: 5,
+        statusId: 4,
         items: itemsWithIds,
         };
 
