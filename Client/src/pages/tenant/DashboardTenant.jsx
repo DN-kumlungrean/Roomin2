@@ -2,18 +2,32 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Box from "../../components/Box";
 import ButtonRI from "../../components/ButtonRI";
-import { getTenantByAuthId } from "../../api/user";
 import CalendarBox from "../../components/CalendarBox"
+import { getTenantByAuthId } from "../../api/user";
+import { getInvoicesByAuthId } from "../../api/invoice"; 
 
 export default function DashboardTenant() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [bills, setBills] = useState([]);       // ✅ เก็บ invoices ทั้งหมด
+  const [totalSum, setTotalSum] = useState(0);  // ✅ เก็บยอดรวมทุกใบ
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const profileData = await getTenantByAuthId();
         setUser(profileData);
+
+        const invoiceData = await getInvoicesByAuthId();
+        setBills(invoiceData);
+
+        const total = invoiceData
+          .filter(inv => inv.status?.name !== "Paid")  // กรองเฉพาะใบที่ยังไม่จ่าย
+          .reduce((sum, inv) => sum + (Number(inv.total) || 0), 0); // รวมยอด
+        setTotalSum(total);
+
+
       } catch (error) {
         console.error("Failed to load dashboard data:", error);
       } finally {
@@ -23,6 +37,7 @@ export default function DashboardTenant() {
     fetchUser();
   }, []);
 
+  if (loading) return <div>Loading...</div>;
   if (!user) return <div>Loading...</div>;
 
   // ดึงข้อมูลค่าเช่า, สถานะ, ประวัติ, การแจ้งซ่อม
@@ -78,7 +93,7 @@ export default function DashboardTenant() {
 
               <div className="flex flex-col gap-3">
                 <div className="text-4xl md:text-4xl font-semibold text-[#645278] leading-tight">
-                  {rentThisMonth} <span className="text-xl md:text-2xl font-medium">บาท</span>
+                   {totalSum.toLocaleString("th-TH")} <span className="text-xl">บาท</span>
                 </div>
                 <div className="text-sm md:text-base text-black leading-relaxed">
                   สถานะ :{" "}
@@ -206,7 +221,7 @@ export default function DashboardTenant() {
 
                 {/* จำกัดสูงสุด ~4 กล่องและให้สกรอลล์ */}
                 <div className="space-y-3 max-h-[340px] overflow-y-auto pr-1">
-                  {paymentHistory.length > 0 ? paymentHistory.map((it, idx) => (
+                  {bills.length > 0 ? bills.map((it, idx) => (
                     <div
                       key={idx}
                       className={`rounded-xl p-4 bg-[#E7DDF1] flex items-center justify-between ${
@@ -217,11 +232,11 @@ export default function DashboardTenant() {
                       }}
                     >
                       <div>
-                        <div>เดือน : {it.month}</div>
-                        <div className="text-[#7D6796] text-sm">จำนวนเงิน : {it.amount} บาท</div>
+                        <div>เดือน : {new Date(it.Date).toLocaleString("th-TH", { month: "long" })}</div>
+                        <div className="text-[#7D6796] text-sm">จำนวนเงิน : {it.total?.toLocaleString("th-TH")} บาท</div>
                       </div>
                       <div className="font-semibold" style={{ color: it.statusColor }}>
-                        {it.status}
+                        {it.status?.name || it.status}
                       </div>
                     </div>
                   )) : <div>ยังไม่มีประวัติการชำระเงิน</div>}

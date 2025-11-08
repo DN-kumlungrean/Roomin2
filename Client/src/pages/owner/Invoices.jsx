@@ -116,13 +116,13 @@ export default function CreateInvoice() {
         billingItems
         .reduce((sum, item) => sum + (parseFloat(item.quantity) || 0) * (parseFloat(item.price) || 0), 0)
         .toFixed(2);
-    // ✅ ฟังก์ชันนี้แค่เปิด popup
+    //เปิด popup
     const handleCreateInvoice = () => {
     if (!tenantData) return alert("ข้อมูลผู้เช่าไม่พร้อม");
     setShowSummary(true);
     };
 
-    // ✅ ฟังก์ชันนี้ค่อยสร้างจริงตอนยืนยัน
+    //สร้างจริงตอนยืนยัน
     const handleConfirmInvoice = async () => {
     setLoading(true);
     try {

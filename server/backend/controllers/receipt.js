@@ -1,6 +1,7 @@
 // controllers/receiptController.js
 import prisma from '../config/prisma.js';
-
+import path from 'path';  // ✅ เพิ่มบรรทัดนี้
+import fs from 'fs';      // ✅ เพิ่มบรรทัดนี้
 // GET all receipts
 // ดึงข้อมูลใบเสร็จทั้งหมด
 export const getAllReceipts = async (req, res) => {
@@ -147,20 +148,30 @@ export const getReceiptsByInvoice = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-// POST create receipt
-// สร้างใบเสร็จใหม่ (บันทึกการชำระเงิน)
 export const createReceipt = async (req, res) => {
   try {
-    const { amount, date, proof, invoiceId } = req.body;
-    
-    // Validation
-    if (!amount || !date || !invoiceId) {
-      return res.status(400).json({ 
-        error: 'Amount, date, and invoice ID are required' 
-      });
+    console.log('🔍 Request received:', {
+      body: req.body,
+      file: req.file
+    });
+
+    const file = req.file;     
+    if (!file) {
+      return res.status(400).json({ error: 'Payment slip file is required.' });
     }
     
+    const { amount, date, invoiceId } = req.body;
+
+    // Validation
+    if (!amount || !date || !invoiceId) {
+      // ลบไฟล์ที่อัปโหลดแล้วถ้า validation ไม่ผ่าน
+      fs.unlinkSync(file.path);
+      return res.status(400).json({ 
+        error: 'Amount, date, and invoice ID are required',
+        received: { amount, date, invoiceId }
+      });
+    }
+
     // ตรวจสอบว่าใบแจ้งหนี้มีอยู่จริง
     const invoice = await prisma.invoice.findUnique({
       where: { InvoiceID: parseInt(invoiceId) },
@@ -176,9 +187,23 @@ export const createReceipt = async (req, res) => {
     });
     
     if (!invoice) {
+      // ลบไฟล์ที่อัปโหลดแล้วถ้าไม่เจอ invoice
+      fs.unlinkSync(file.path);
       return res.status(404).json({ error: 'Invoice not found' });
     }
+
+    // ✅ เปลี่ยนชื่อไฟล์ให้มี invoiceId
+    const oldPath = file.path;
+    const ext = path.extname(file.originalname);
+    const newFilename = `${invoiceId}_${Date.now()}${ext}`;
+    const newPath = path.join(path.dirname(oldPath), newFilename);
     
+    // Rename file
+    fs.renameSync(oldPath, newPath);
+    
+    const fileUrl = `/uploads/${newFilename}`;
+    console.log('✅ File saved as:', fileUrl);
+
     // คำนวณยอดรวมและยอดที่ชำระแล้ว
     const totalAmount = invoice.itemlists.reduce(
       (sum, itemlist) => sum + (itemlist.quantity * itemlist.item.price),
@@ -191,9 +216,11 @@ export const createReceipt = async (req, res) => {
     );
     
     const remaining = totalAmount - paidAmount;
-    
+
     // ตรวจสอบว่ายอดที่จะชำระไม่เกินยอดคงเหลือ
     if (parseFloat(amount) > remaining) {
+      // ลบไฟล์ถ้ายอดเกิน
+      fs.unlinkSync(newPath);
       return res.status(400).json({ 
         error: `Payment amount exceeds remaining balance. Remaining: ${remaining}` 
       });
@@ -206,7 +233,7 @@ export const createReceipt = async (req, res) => {
         name: 'ชำระแล้ว'
       }
     });
-    
+
     // สร้างใบเสร็จและอัพเดทสถานะใบแจ้งหนี้ (ถ้าชำระครบ) พร้อมกัน
     const receipt = await prisma.$transaction(async (tx) => {
       // สร้างใบเสร็จ
@@ -214,7 +241,7 @@ export const createReceipt = async (req, res) => {
         data: {
           amount: parseFloat(amount),
           date: new Date(date),
-          proof,
+          proof: fileUrl,
           invoiceId: parseInt(invoiceId)
         },
         include: {
@@ -239,7 +266,7 @@ export const createReceipt = async (req, res) => {
           }
         }
       });
-      
+
       // ตรวจสอบว่าชำระครบหรือยัง
       const newPaidAmount = paidAmount + parseFloat(amount);
       
@@ -256,11 +283,137 @@ export const createReceipt = async (req, res) => {
       return newReceipt;
     });
     
-    res.status(201).json(receipt);
+    console.log('✅ Receipt created successfully:', receipt.ReceiptID);
+    res.status(201).json({ success: true, receipt });
+
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('❌ Error in createReceipt:', error);
+    
+    // ลบไฟล์ถ้าเกิด error
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+    
+    res.status(500).json({ 
+      error: error.message
+    });
   }
 };
+
+
+// POST create receipt
+// สร้างใบเสร็จใหม่ (บันทึกการชำระเงิน)
+// export const createReceipt = async (req, res) => {
+//   try {
+//     const { amount, date, proof, invoiceId } = req.body;
+    
+//     // Validation
+//     if (!amount || !date || !invoiceId) {
+//       return res.status(400).json({ 
+//         error: 'Amount, date, and invoice ID are required' 
+//       });
+//     }
+    
+//     // ตรวจสอบว่าใบแจ้งหนี้มีอยู่จริง
+//     const invoice = await prisma.invoice.findUnique({
+//       where: { InvoiceID: parseInt(invoiceId) },
+//       include: {
+//         itemlists: {
+//           include: {
+//             item: true
+//           }
+//         },
+//         receipts: true,
+//         status: true
+//       }
+//     });
+    
+//     if (!invoice) {
+//       return res.status(404).json({ error: 'Invoice not found' });
+//     }
+    
+//     // คำนวณยอดรวมและยอดที่ชำระแล้ว
+//     const totalAmount = invoice.itemlists.reduce(
+//       (sum, itemlist) => sum + (itemlist.quantity * itemlist.item.price),
+//       0
+//     );
+    
+//     const paidAmount = invoice.receipts.reduce(
+//       (sum, receipt) => sum + receipt.amount,
+//       0
+//     );
+    
+//     const remaining = totalAmount - paidAmount;
+    
+//     // ตรวจสอบว่ายอดที่จะชำระไม่เกินยอดคงเหลือ
+//     if (parseFloat(amount) > remaining) {
+//       return res.status(400).json({ 
+//         error: `Payment amount exceeds remaining balance. Remaining: ${remaining}` 
+//       });
+//     }
+    
+//     // หาสถานะ "ชำระแล้ว"
+//     const paidStatus = await prisma.status.findFirst({
+//       where: {
+//         Type: 'INVOICE',
+//         name: 'ชำระแล้ว'
+//       }
+//     });
+    
+//     // สร้างใบเสร็จและอัพเดทสถานะใบแจ้งหนี้ (ถ้าชำระครบ) พร้อมกัน
+//     const receipt = await prisma.$transaction(async (tx) => {
+//       // สร้างใบเสร็จ
+//       const newReceipt = await tx.receipt.create({
+//         data: {
+//           amount: parseFloat(amount),
+//           date: new Date(date),
+//           proof,
+//           invoiceId: parseInt(invoiceId)
+//         },
+//         include: {
+//           invoice: {
+//             include: {
+//               room: {
+//                 include: {
+//                   building: {
+//                     include: {
+//                       dormitory: true
+//                     }
+//                   }
+//                 }
+//               },
+//               status: true,
+//               itemlists: {
+//                 include: {
+//                   item: true
+//                 }
+//               }
+//             }
+//           }
+//         }
+//       });
+      
+//       // ตรวจสอบว่าชำระครบหรือยัง
+//       const newPaidAmount = paidAmount + parseFloat(amount);
+      
+//       // ถ้าชำระครบ อัพเดทสถานะเป็น "ชำระแล้ว"
+//       if (newPaidAmount >= totalAmount && paidStatus) {
+//         await tx.invoice.update({
+//           where: { InvoiceID: parseInt(invoiceId) },
+//           data: {
+//             statusId: paidStatus.StatusID
+//           }
+//         });
+//       }
+      
+//       return newReceipt;
+//     });
+    
+//     res.status(201).json(receipt);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
 
 // PUT update receipt
 // อัพเดทข้อมูลใบเสร็จ

@@ -1,7 +1,6 @@
 import prisma from '../config/prisma.js';
 
 // GET all users
-// ดึงข้อมูล user ทั้งหมด
 export const getAllUsers = async (req, res) => {
   try {
     const users = await prisma.user.findMany({

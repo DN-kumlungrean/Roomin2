@@ -16,6 +16,15 @@ export default function Payments() {
       try {
         const data = await getInvoicesByAuthId(); // ดึง invoices ของผู้ใช้งานปัจจุบัน
         console.log(data);
+        // ดูแต่ละ invoice
+        data.forEach((inv, index) => {
+          console.log(`Invoice ${index + 1}:`, {
+            InvoiceID: inv.InvoiceID,
+            total: inv.total,
+            itemlists: inv.itemlists
+          });
+        });
+      
         setBills(data);
       } catch (err) {
         console.error(err);
@@ -40,6 +49,16 @@ export default function Payments() {
 
   const handleDetail = (bill) => {
     navigate(`/tenant/payments?detail=${bill.InvoiceID}`);
+  };
+  // ใน Payments.jsx
+  const handlePaymentSuccess = (invoiceId, paidAt) => {
+    setBills((prevBills) =>
+      prevBills.map((b) =>
+        b.InvoiceID === invoiceId
+          ? { ...b, status: { name: "PAID" }, paidAt: paidAt || new Date().toISOString() }
+          : b
+      )
+    );
   };
 
   if (loading) return <div>Loading invoices...</div>;
@@ -88,7 +107,7 @@ export default function Payments() {
                         ? new Date(
                             new Date(b.Date).getFullYear(), // ปี
                             new Date(b.Date).getMonth(),    // เดือน (0-indexed)
-                            5                               // fix วันที่ 5
+                            25                               // fix วันที่ 5
                           ).toLocaleDateString('th-TH')
                         : "-"}
                     </div>
@@ -156,6 +175,7 @@ export default function Payments() {
 
       {showPopup && selectedBill && 
       <PaymentPopup onClose={() => setShowPopup(false)} 
+      onSuccess={handlePaymentSuccess}  
       amount={selectedBill.total}
       invoiceId={selectedBill.InvoiceID}
       />}

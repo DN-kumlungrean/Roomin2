@@ -16,13 +16,10 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 // Middleware
-// app.use(morgan('dev'));
-// app.use(express.json());
-// app.use(cors());
 app.use(morgan('dev'));                          // log request
-// app.use(cors({ origin: '*' }));                  // เปิด CORS (ปรับ origin ตามต้องการ)
 app.use(express.json());                          // แปลง JSON body
 app.use(express.urlencoded({ extended: true })); // รองรับ form submission
+app.use('/uploads', express.static(path.join(process.cwd(), 'public', 'uploads')));
 app.use(cookieParser());                          // รองรับ cookies
 app.use(cors({
   origin: 'http://localhost:5173',
