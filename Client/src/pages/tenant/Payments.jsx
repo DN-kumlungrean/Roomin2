@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PaymentPopup from "../../components/PaymentPopup";
 import arrowSort from "../../assets/arrow-sort.png";
-import { getInvoicesByAuthId } from "../../api/invoice"; // ฟังก์ชันเรียก invoices จริง
+import { getInvoicesByAuthId } from "../../api/invoice";
 
 export default function Payments() {
   const navigate = useNavigate();
@@ -14,14 +14,14 @@ export default function Payments() {
   useEffect(() => {
     const fetchInvoices = async () => {
       try {
-        const data = await getInvoicesByAuthId(); // ดึง invoices ของผู้ใช้งานปัจจุบัน
+        const data = await getInvoicesByAuthId();
         console.log(data);
-        // ดูแต่ละ invoice
+        
         data.forEach((inv, index) => {
           console.log(`Invoice ${index + 1}:`, {
             InvoiceID: inv.InvoiceID,
             total: inv.total,
-            itemlists: inv.itemlists
+            statusName: inv.status?.name
           });
         });
       
@@ -35,6 +35,36 @@ export default function Payments() {
     fetchInvoices();
   }, []);
 
+  // ✅ ฟังก์ชันกำหนดสถานะและสี
+  const getStatusConfig = (statusName) => {
+    switch (statusName) {
+      case "Paid":
+        return {
+          text: "ชำระแล้ว",
+          bgColor: "bg-[#97D76C]",
+          isPaid: true
+        };
+      case "Success":
+        return {
+          text: "รอการตรวจสอบ",
+          bgColor: "bg-gray-400",
+          isPaid: false
+        };
+      case "Pending":
+        return {
+          text: "ค้างชำระ",
+          bgColor: "bg-[#F15F5B]",
+          isPaid: false
+        };
+      default:
+        return {
+          text: "ไม่ทราบสถานะ",
+          bgColor: "bg-gray-300",
+          isPaid: false
+        };
+    }
+  };
+
   const formatAmount = (n) =>
     n.toLocaleString("th-TH", { minimumFractionDigits: 0 });
 
@@ -43,19 +73,23 @@ export default function Payments() {
   };
 
   const handlePay = (bill) => {
-    setSelectedBill(bill); // เก็บ invoice ที่เลือก
+    setSelectedBill(bill);
     setShowPopup(true);
   };
 
   const handleDetail = (bill) => {
     navigate(`/tenant/payments?detail=${bill.InvoiceID}`);
   };
-  // ใน Payments.jsx
+
   const handlePaymentSuccess = (invoiceId, paidAt) => {
     setBills((prevBills) =>
       prevBills.map((b) =>
         b.InvoiceID === invoiceId
-          ? { ...b, status: { name: "PAID" }, paidAt: paidAt || new Date().toISOString() }
+          ? { 
+              ...b, 
+              status: { ...b.status, name: "Success" }, 
+              paidAt: paidAt || new Date().toISOString() 
+            }
           : b
       )
     );
@@ -87,7 +121,10 @@ export default function Payments() {
 
             <div className="mt-3 space-y-3">
               {bills.map((b) => {
-                const isPaid = b.status.name === "PAID"; // ปรับตาม response จริง
+                // ✅ ดึงข้อมูลสถานะจาก status.name
+                const statusConfig = getStatusConfig(b.status?.name);
+                const { text: statusText, bgColor: statusBgColor, isPaid } = statusConfig;
+                
                 return (
                   <div
                     key={b.InvoiceID}
@@ -95,24 +132,30 @@ export default function Payments() {
                   >
                     <div className="col-span-1 text-center">
                       <span className="inline-flex items-center justify-center bg-white rounded-xl px-3 py-1 text-[#3A3A3A] font-medium">
-                        {b.room.RoomName || "-"}{/* ปรับตาม structure */}
+                        {b.room?.RoomName || "-"}
                       </span>
                     </div>
 
                     <div className="col-span-2 text-center text-[#3A3A3A]">
                       {b.Date ? new Date(b.Date).toLocaleDateString('th-TH') : "-"}
                     </div>
+
                     <div className="col-span-2 text-center text-[#3A3A3A]">
                       {b.Date
                         ? new Date(
-                            new Date(b.Date).getFullYear(), // ปี
-                            new Date(b.Date).getMonth(),    // เดือน (0-indexed)
-                            25                               // fix วันที่ 5
+                            new Date(b.Date).getFullYear(),
+                            new Date(b.Date).getMonth(),
+                            25
                           ).toLocaleDateString('th-TH')
                         : "-"}
                     </div>
+
                     <div className="col-span-2 text-center text-[#3A3A3A]">
-                      {b.paidAt || "-"}
+                      {b.paidAt 
+                        ? new Date(b.paidAt).toLocaleDateString('th-TH')
+                        : b.receipts?.[0]?.date
+                        ? new Date(b.receipts[0].date).toLocaleDateString('th-TH')
+                        : "-"}
                     </div>
 
                     <div className="col-span-2 text-center font-medium">
@@ -126,7 +169,6 @@ export default function Payments() {
                         className="p-2 rounded-lg hover:bg-[#DCCBE9] active:scale-95 transition"
                         title="ดาวน์โหลด"
                       >
-                        {/* SVG download */}
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           viewBox="0 0 24 24"
@@ -138,18 +180,22 @@ export default function Payments() {
                         </svg>
                       </button>
 
+                      {/* ✅ แสดงสถานะตาม status.name */}
                       <span
-                        className={
-                          "flex items-center justify-center w-[120px] h-[34px] rounded-full text-sm font-medium " +
-                          (isPaid
-                            ? "bg-[#97D76C] text-black"
-                            : "bg-[#F15F5B] text-black")
-                        }
+                        className={`flex items-center justify-center w-[120px] h-[34px] rounded-full text-sm font-medium text-black ${statusBgColor}`}
                       >
-                        {isPaid ? "ชำระแล้ว" : "ค้างชำระ"}
+                        {statusText}
                       </span>
 
+                      {/* ✅ แสดงปุ่มตามสถานะ */}
                       {isPaid ? (
+                        <button
+                          onClick={() => handleDetail(b)}
+                          className="w-[150px] h-[34px] rounded-full text-sm font-medium bg-[#FEB863] text-black hover:bg-[#FEA130] active:scale-95 transition"
+                        >
+                          ดูรายละเอียด
+                        </button>
+                      ) : b.status?.name === "Success" ? (
                         <button
                           onClick={() => handleDetail(b)}
                           className="w-[150px] h-[34px] rounded-full text-sm font-medium bg-[#FEB863] text-black hover:bg-[#FEA130] active:scale-95 transition"
@@ -174,10 +220,11 @@ export default function Payments() {
       </div>
 
       {showPopup && selectedBill && 
-      <PaymentPopup onClose={() => setShowPopup(false)} 
-      onSuccess={handlePaymentSuccess}  
-      amount={selectedBill.total}
-      invoiceId={selectedBill.InvoiceID}
+      <PaymentPopup 
+        onClose={() => setShowPopup(false)} 
+        onSuccess={handlePaymentSuccess}  
+        amount={selectedBill.total}
+        invoiceId={selectedBill.InvoiceID}
       />}
     </div>
   );
