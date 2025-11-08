@@ -4,7 +4,7 @@ import Logo from "/src/components/Logo.jsx";
 import profile from "/src/assets/profile.png";
 import correct from "/src/assets/correct.svg";
 import { createInvoice as createInvoiceApi } from "../../api/invoice";
-import { getMyProfile } from "../../api/user";
+import { getTenantByAuthId } from "../../api/user";
 import { createItem as createItemApi } from "../../api/item";
 import { getItems as getAllItems } from "../../api/item";
 import { getAllInvoices } from "../../api/invoice"
@@ -76,7 +76,7 @@ export default function CreateInvoice() {
     useEffect(() => {
         const fetchTenant = async () => {
         try {
-            const tenant = await getMyProfile();
+            const tenant = await getTenantByAuthId();
             setTenantData(tenant);
         } catch (err) {
             console.error(err);
@@ -140,7 +140,7 @@ export default function CreateInvoice() {
             const newItem = await createItemApi({
                 name: item.label,
                 price: parseFloat(item.price) || 0,
-                statusId: 8,
+                statusId: 6,
             });
             return {
                 itemId: newItem.ItemID,
@@ -154,7 +154,7 @@ export default function CreateInvoice() {
         Date: new Date().toISOString(),
         userId: tenantData.UserID || tenantData.id,
         roomId: tenantData.contracts[0].roomId,
-        statusId: 7,
+        statusId: 5,
         items: itemsWithIds,
         };
 
@@ -184,7 +184,7 @@ export default function CreateInvoice() {
                             <img src={profile} alt="Tenant Avatar" className="w-full h-full object-cover" />
                         </div>
                         <div className="flex flex-col">
-                        <div className="text-xl font-semibold">{tenantData.name}</div>
+                        <div className="text-xl font-semibold">{tenantData.Name}</div>
                         <div className="text-sm">
                         หมดสัญญา{" "}
                         <span className="font-medium ml-1">
@@ -209,7 +209,7 @@ export default function CreateInvoice() {
                 </div>
                 <div className="flex items-center text-sm text-black">
                     <span className="w-5 h-5 mr-3 text-gray-500">💬</span>
-                    {tenantData.email}
+                    {tenantData.Gmail}
                 </div>
                 {/* ปุ่ม */}
                 <div className="flex gap-4 pt-2">
@@ -236,12 +236,12 @@ export default function CreateInvoice() {
                             <div className="mt-2 text-sm font-semibold leading-none font-serif">ROOMIN</div>
                         </div>
                         <div className="text-sm text-gray-600 font-serif ">
-                            ใบแจ้งค่าห้อง ห้อง 1101 คอนโด พีเค อาคาร 2
+                            ใบแจ้งค่าห้อง ห้อง {tenantData.contracts[0].roomId} คอนโด พีเค อาคาร 2
                         </div>
                                 
                         <div className="text-sm text-gray-600 font-serif">
                             <span className="font-bold">ผู้อยู่อาศัย :</span>
-                            <span className="font-serif ml-1">{tenantData.Name} {tenantData.FName} {tenantData.LName} </span>
+                            <span className="font-serif ml-1">{tenantData.FName} {tenantData.LName} </span>
                         </div>
                     </div>
                             

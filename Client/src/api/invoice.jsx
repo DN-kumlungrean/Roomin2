@@ -34,7 +34,7 @@ export const createInvoice = async (invoiceData) => {
 
 // ดึง invoices ของผู้ใช้
 export const getInvoicesByAuthId = async (authId) => {
-  const res = await axios.get(`${API_URL}/user/test12345`);
+  const res = await axios.get(`${API_URL}/user/e4f77a4e-0655-40b0-8881-27a87da54824`);
   return res.data;
 };
 
@@ -44,9 +44,9 @@ export const getAllInvoices = async (invoice) => {
 };
 
 // สร้าง QR จาก Omise ผ่าน backend
-export const createQRPayment = async (amount) => {
+export const createQRPayment = async (invoiceId, amount) => {
   try {
-    const res = await axios.post(`${API_URL}/payment`, { amount });
+    const res = await axios.post(`${API_URL}/payment`, { invoiceId, amount});
     return res.data; // จะได้ { success, qrCode, chargeId }
   } catch (error) {
     if (error.response) {

@@ -9,7 +9,8 @@ import {
   showCompleteProfileForm,
   handleCompleteProfileSubmit,
   handleLogout,
-  getMyProfile
+  getMyProfile,
+  getMyUserData
 } from '../controllers/auth.js';
 
 
@@ -31,5 +32,7 @@ router.get('/auth/check-profile', checkProfile);
 router.get('/auth/complete-profile', showCompleteProfileForm);
 router.post('/auth/complete-profile', handleCompleteProfileSubmit);
 router.get('/auth/dashboard', showDashboard);
+
+router.get('/me', getMyUserData);
 
 export default router;

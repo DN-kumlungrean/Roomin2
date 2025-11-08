@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from "react";
@@ -15,7 +14,7 @@ function PaymentButton({ onClick, children, className }) {
   );
 }
 
-export default function PaymentPopup({ onClose, amount }) {
+export default function PaymentPopup({ onClose, amount, invoiceId }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [qrCode, setQrCode] = useState(null);
   const [loadingQR, setLoadingQR] = useState(false);
@@ -29,7 +28,7 @@ export default function PaymentPopup({ onClose, amount }) {
   const handleGenerateQR = async () => {
     setLoadingQR(true);
     try {
-      const res = await createQRPayment(amount);
+      const res = await createQRPayment(invoiceId, amount);
       if (res.success) {
         setQrCode(res.qrCode);
       } else {
@@ -48,6 +47,7 @@ export default function PaymentPopup({ onClose, amount }) {
 
     const formData = new FormData();
     formData.append("file", selectedFile);
+    formData.append("invoiceId", invoiceId);
 
     try {
       const res = await fetch("/api/upload-slip", {

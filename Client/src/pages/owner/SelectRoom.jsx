@@ -45,8 +45,8 @@ export default function SelectRoom() {
   });
 
   const sortedRooms = [...filteredRooms].sort((a, b) => {
-    const nameA = parseInt(a.roomName);
-    const nameB = parseInt(b.roomName);
+    const nameA = parseInt(a.RoomName);
+    const nameB = parseInt(b.RoomName);
     return nameA - nameB;
   });
 
@@ -112,7 +112,7 @@ export default function SelectRoom() {
             return (
               <RoomCard
                 key={room.RoomID}
-                roomNumber={room.roomName || room.number}
+                roomNumber={room.RoomName || room.number}
                 hasBill={hasTenant}
                 tenant={tenantName}
                 month={currentMonth}

@@ -377,7 +377,7 @@ export const getRoomCurrentTenant = async (req, res) => {
 // สร้างห้องใหม่
 export const createRoom = async (req, res) => {
   try {
-    const { roomName, price, statusId, buildingId } = req.body;
+    const { RoomName, price, statusId, buildingId } = req.body;
     
     // Validation
     if (!price || !statusId || !buildingId) {
@@ -409,7 +409,7 @@ export const createRoom = async (req, res) => {
     
     const room = await prisma.room.create({
       data: {
-        roomName: roomName,
+        RoomName: RoomName,
         price: parseFloat(price),
         statusId: parseInt(statusId),
         buildingId: parseInt(buildingId)

@@ -122,3 +122,26 @@ export const deleteUser = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// GET user by authId
+export const getUserByAuthId = async (req, res) => {
+  try {
+    const { authId } = req.params;
+    const user = await prisma.user.findUnique({
+      where: { authId },
+      include: {
+        contracts: true,
+        roommates: true,
+        invoices: true
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

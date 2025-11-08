@@ -305,3 +305,38 @@ export const handleLogout = async (req, res) => {
   await supabase.auth.signOut();
   return res.status(200).json({ message: 'Logged out successfully' });
 };
+
+
+// ======================================================================
+// 🔹 ดึงข้อมูล Tenant/Owner ของ User ที่ Login อยู่
+// ======================================================================
+export const getMyUserData = async (req, res) => {
+  // 1. ใช้ User Client ถอดรหัส Token
+  const userClient = createSupabaseClient(req, res);
+  const { data: { user }, error: authError } = await userClient.auth.getUser();
+  
+  if (authError || !user) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  // 2. ใช้ Admin Client ดึงข้อมูลจาก DB
+  const { data: userData, error: dbError } = await supabase
+    .from('User')
+    .select('*')
+    .eq('authId', user.id)
+    .maybeSingle();
+
+  if (dbError) {
+    console.error('Error fetching user data:', dbError);
+    return res.status(500).json({ message: 'Database Error' });
+  }
+
+  if (!userData) {
+    return res.status(404).json({ 
+      message: 'User profile not found', 
+      needsProfile: true 
+    });
+  }
+
+  return res.status(200).json({ user: userData });
+};

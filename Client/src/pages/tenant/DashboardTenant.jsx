@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Box from "../../components/Box";
 import ButtonRI from "../../components/ButtonRI";
-import { getMyProfile } from "../../api/user";
+import { getTenantByAuthId } from "../../api/user";
 import CalendarBox from "../../components/CalendarBox"
 
 export default function DashboardTenant() {
@@ -12,7 +12,7 @@ export default function DashboardTenant() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const profileData = await getMyProfile();
+        const profileData = await getTenantByAuthId();
         setUser(profileData);
       } catch (error) {
         console.error("Failed to load dashboard data:", error);
@@ -38,7 +38,7 @@ export default function DashboardTenant() {
         {/* แถบต้อนรับ */}
         <section className="bg-white rounded-2xl px-6 py-6 md:px-8 md:py-8 mb-5">
           <h1 className="text-4xl md:text-3xl lg:text-4xl font-bold text-black">
-            สวัสดี คุณ {user.Name}
+            สวัสดี คุณ {user.FName}
           </h1>
           <p className="mt-4 text-base md:text-lg text-black leading-snug">
             คุณสามารถติดตามค่าใช้จ่าย แจ้งซ่อม และเข้าถึงข้อมูลสำคัญได้ง่าย ๆ
@@ -73,7 +73,7 @@ export default function DashboardTenant() {
               className="min-h-[320px] flex flex-col justify-between p-4 pb-0 rounded-2xl"
             >
               <h2 className="text-lg md:text-2xl font-bold text-black mb-3">
-                ค่าเช่าประจำเดือนนี้
+                ค่าเช่าประจำเดือนนี้ 
               </h2>
 
               <div className="flex flex-col gap-3">
