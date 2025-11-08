@@ -45,7 +45,7 @@ export default function Payments() {
     setNotification({ show: true, message: downloadMessage });
   };
   
-  // ✅ ฟังก์ชันกำหนดสถานะและสี
+  // ฟังก์ชันกำหนดสถานะและสี
   const getStatusConfig = (statusName) => {
     switch (statusName) {
       case "Paid":
@@ -128,7 +128,7 @@ export default function Payments() {
 
             <div className="mt-3 space-y-3">
               {bills.map((b) => {
-                // ✅ ดึงข้อมูลสถานะจาก status.name
+                // ดึงข้อมูลสถานะจาก status.name
                 const statusConfig = getStatusConfig(b.status?.name);
                 const { text: statusText, bgColor: statusBgColor, isPaid } = statusConfig;
                 
@@ -187,14 +187,14 @@ export default function Payments() {
                         </svg>
                       </button>
 
-                      {/* ✅ แสดงสถานะตาม status.name */}
+                      {/* แสดงสถานะตาม status.name */}
                       <span
                         className={`flex items-center justify-center w-[120px] h-[34px] rounded-full text-sm font-medium text-black ${statusBgColor}`}
                       >
                         {statusText}
                       </span>
 
-                      {/* ✅ แสดงปุ่มตามสถานะ */}
+                      {/* แสดงปุ่มตามสถานะ */}
                       {isPaid ? (
                         <button
                           onClick={() => handleDetail(b)}

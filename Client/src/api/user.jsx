@@ -10,7 +10,7 @@ export const getMyProfile = async () => {
     const user = res.data.user;
 
     if (user?.authId) {
-      localStorage.setItem("authId", user.authId); // 🔹 เก็บ authId
+      localStorage.setItem("authId", user.authId); //เก็บ authId
     }
 
     return user;
@@ -32,7 +32,7 @@ export const getTenantByAuthId = async () => {
 
 export const getAdminByAuthId = async () => {
   try {
-    const res = await axios.get(`http://localhost:3000/api/admin/ea21ad0f-1490-4b0d-9c30-3a0ef81e4321`);
+    const res = await axios.get(`http://localhost:3000/api/ea21ad0f-1490-4b0d-9c30-3a0ef81e4321`);
     return res.data;
   } catch (error) {
     console.error("Error fetching admin by authId:", error);

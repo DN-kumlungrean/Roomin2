@@ -1,7 +1,7 @@
 import axios from 'axios'
-const API_URL = "http://localhost:3000/api/items"; // เปลี่ยนตาม backend ของคุณ
+const API_URL = "http://localhost:3000/api/items";
 
-// ดึง invoices ของผู้ใช้
+//ดึง invoices ของผู้ใช้
 export const getInvoicesByAuthId = async (authId) => {
   const res = await axios.get(`${API_URL}/user/e4f77a4e-0655-40b0-8881-27a87da54824`);
   return res.data;
@@ -14,14 +14,11 @@ export const createItem = async (itemData) => {
         "Content-Type": "application/json",
       },
     });
-    return response.data; // ส่งกลับข้อมูลจาก backend
+    return response.data;
   } catch (error) {
-    // จัดการ error ให้ชัดเจน
     if (error.response) {
-      // backend ส่ง error มา
       throw error.response.data;
     } else {
-      // network error หรืออื่น ๆ
       throw { error: error.message };
     }
   }

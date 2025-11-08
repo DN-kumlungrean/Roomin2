@@ -2,7 +2,6 @@
 import prisma from '../config/prisma.js';
 
 // GET all statuses
-// ดึงข้อมูลสถานะทั้งหมด สามารถ filter ตาม Type ได้
 export const getAllStatuses = async (req, res) => {
   try {
     const { type } = req.query; // ?type=ROOM หรือ ?type=INVOICE
@@ -23,7 +22,6 @@ export const getAllStatuses = async (req, res) => {
 };
 
 // GET status by ID
-// ดึงข้อมูลสถานะตาม ID พร้อมนับจำนวนการใช้งาน
 export const getStatusById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -52,7 +50,6 @@ export const getStatusById = async (req, res) => {
 };
 
 // GET statuses by type
-// ดึงสถานะตามประเภท (ROOM, INVOICE, ITEM)
 export const getStatusesByType = async (req, res) => {
   try {
     const { type } = req.params; // /statuses/type/ROOM

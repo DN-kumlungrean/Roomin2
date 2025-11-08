@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = "http://localhost:3000/api"; // base URL
+const API_URL = "http://localhost:3000/api";
 
 // ดึงห้องทั้งหมด
 export const getAllRooms = async () => {
@@ -13,7 +13,7 @@ export const getAllRooms = async () => {
   }
 };
 
-// ดึงห้องว่าง (filter)
+// ดึงห้องว่าง
 export const getAvailableRooms = async () => {
   try {
     const res = await axios.get(`${API_URL}/rooms/filter`);

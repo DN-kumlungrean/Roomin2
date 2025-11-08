@@ -1,27 +1,47 @@
-# docker-compose.yml
-version: '3.8' # กำหนดเวอร์ชันของ Compose file
+version: '3.8'
 
 services:
-  # 1. บริการ Backend (Node.js API)
-  backend:
-    build: 
-      context: ./server # บอกว่า Dockerfile อยู่ในโฟลเดอร์ไหน
-      dockerfile: Dockerfile
-    image: myapp-backend:latest # ชื่อ Image ที่จะสร้าง
-    ports:
-      - "3000:3000" # แมปพอร์ต (Host:Container)
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    restart: always
     environment:
-      NODE_ENV: production
-      DATABASE_URL: https://unqlbqecrpkfrdibuale.supabase.co/
-    depends_on:
-      - db # บอกว่าต้องรอให้ db เริ่มทำงานก่อน
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydb
     volumes:
-      - ./backend:/app # สำหรับ development (ถ้าไม่ใช้ dev ให้ลบออก)
-      - /app/node_modules # ไม่ต้องทำซ้ำ node_modules
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     networks:
       - myapp-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d mydb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # 2. บริการ Frontend (React/Nginx)
+  # Backend Service
+  backend:
+    build: 
+      context: ./server
+      dockerfile: Dockerfile
+    image: myapp-backend:latest
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://postgres.unqlbqecrpkfrdibuale:FCMl4tnQF6gxtnEA@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres
+      # Add your Supabase URL if needed for other services
+      SUPABASE_URL: https://unqlbqecrpkfrdibuale.supabase.co/
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - myapp-network
+    restart: unless-stopped
+
+  # Frontend Service
   frontend:
     build:
       context: ./Client
@@ -33,27 +53,12 @@ services:
       - backend
     networks:
       - myapp-network
+    restart: unless-stopped
 
-  # 3. บริการ Database (PostgreSQL)
-  db:
-    image: postgres:16-alpine # ใช้ Image สำเร็จรูป
-    restart: always # หากล่ม ให้รีสตาร์ทอัตโนมัติ
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: mydb
-    volumes:
-      - db-data:/var/lib/postgresql/data # เก็บข้อมูลลงใน Volume เพื่อให้ข้อมูลไม่หาย
-    ports:
-      - "5432:5432" # แมปพอร์ต (Host:Container)
-    networks:
-      - myapp-network
-
-# 4. กำหนด Volume สำหรับเก็บข้อมูล Database
 volumes:
   db-data:
+    driver: local
 
-# 5. กำหนด Network ภายใน (เพื่อให้ containers สื่อสารกันได้ด้วยชื่อบริการ)
 networks:
   myapp-network:
     driver: bridge

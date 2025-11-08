@@ -72,7 +72,7 @@ export default function CreateInvoice() {
     const [showSummary, setShowSummary] = useState(false); //
     const [lastInvoiceId, setLastInvoiceId] = useState(0);
 
-    // ดึงข้อมูล tenant จาก backend ตาม authId ใน localStorage
+    //ดึงข้อมูล tenant จาก backend ตาม authId ใน localStorage
     useEffect(() => {
         const fetchTenant = async () => {
         try {
@@ -88,7 +88,7 @@ export default function CreateInvoice() {
 
     useEffect(() => {
         const fetchInvoices = async () => {
-            const allInvoices = await getAllInvoices(); // API ดึงข้อมูล invoice ทั้งหมด
+            const allInvoices = await getAllInvoices(); 
             if (allInvoices.length > 0) {
             const maxId = Math.max(...allInvoices.map(inv => inv.InvoiceID));
             setLastInvoiceId(maxId);
@@ -97,7 +97,7 @@ export default function CreateInvoice() {
         fetchInvoices();
     }, []);
 
-    // ฟังก์ชันจัดการรายการ invoice
+    //จัดการรายการ invoice
     const handleAddItem = () => {
         const newItem = { id: Date.now(), label: "รายการใหม่", quantity: "", price: "" };
         setBillingItems((prev) => [...prev, newItem]);
@@ -154,7 +154,7 @@ export default function CreateInvoice() {
         Date: new Date().toISOString(),
         userId: tenantData.UserID || tenantData.id,
         roomId: tenantData.contracts[0].roomId,
-        statusId: 4,
+        statusId: 3,
         items: itemsWithIds,
         };
 

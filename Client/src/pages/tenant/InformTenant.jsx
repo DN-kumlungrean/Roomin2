@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import apiClient from "../../api/axios";
 import { useAuth } from "../../contexts/AuthContext";
 import Logo from "../../components/Logo";
-import bgVector from "../../assets/bg-vector.svg"; // ✅ พื้นหลังม่วงเหมือนหน้า LoginTenant
+import bgVector from "../../assets/bg-vector.svg";
 
 export default function InformTenant() {
   const navigate = useNavigate();
@@ -52,7 +52,7 @@ export default function InformTenant() {
 
   return (
     <div className="relative min-h-screen overflow-hidden">
-      {/* ✅ พื้นหลัง vector ม่วง */}
+      {/* พื้นหลัง vector ม่วง */}
       <img
         src={bgVector}
         alt="background"
@@ -63,7 +63,7 @@ export default function InformTenant() {
         }}
       />
 
-      {/* ✅ เนื้อหาหลัก */}
+      {/* เนื้อหาหลัก */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 pt-10">
         {/* โลโก้ + ROOMIN */}
         <header className="flex items-center gap-8 mb-0 select-none">
@@ -73,7 +73,7 @@ export default function InformTenant() {
           </h1>
         </header>
 
-        {/* ✅ หัวข้อสีดำ */}
+        {/* หัวข้อสีดำ */}
         <h2 className="text-center text-[36px] font-[Playfair_Display] text-black mt-14 mb-6">
           ลงทะเบียนผู้เช่า
         </h2>
@@ -84,7 +84,7 @@ export default function InformTenant() {
           </div>
         )}
 
-        {/* ✅ ฟอร์มลงทะเบียน */}
+        {/* ฟอร์มลงทะเบียน */}
         <form onSubmit={handleSubmit} className="w-full max-w-[564px]">
           {/* ชื่อ / นามสกุล */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

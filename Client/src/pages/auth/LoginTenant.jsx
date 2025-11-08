@@ -13,16 +13,13 @@ const handleLogin = async (e) => {
     setError("");
 
     try {
-      // (ยิง API /login ... ที่เรา "อัปเกรด" แล้วใน Backend)
       const response = await apiClient.post("/login", {
         email: email,
         password: password,
       });
 
-      const userProfile = response.data.user; // (นี่คือ "Profile" ... ไม่ใช่ "Auth User")
-      setUser(userProfile); // (อัปเดตความจำ)
-      
-      // (ตรรกะ "คัดแยก" Role)
+      const userProfile = response.data.user;
+      setUser(userProfile);
       if (userProfile.role === 'OWNER') {
         navigate("/owner/dashboard");
       } else {
@@ -39,7 +36,6 @@ const handleLogin = async (e) => {
   };
 
   const handleGoogleLogin = () => {
-    // (ส่งสัญญาณ ?role=TENANT ... เพื่อให้ Backend "ฝัง" Cookie ที่ถูกต้อง)
     window.location.href = "http://localhost:3000/api/auth/login?role=TENANT";
   };
 

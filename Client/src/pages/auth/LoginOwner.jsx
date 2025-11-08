@@ -19,10 +19,9 @@ const handleLogin = async (e) => {
         password: password,
       });
 
-      const userProfile = response.data.user; // (นี่คือ "Profile" ... ไม่ใช่ "Auth User")
+      const userProfile = response.data.user;
       setUser(userProfile); // (อัปเดตความจำ)
-      
-      // (ตรรกะ "คัดแยก" Role)
+
       if (userProfile.role === 'OWNER') {
         navigate("/owner/dashboard");
       } else {
@@ -39,7 +38,6 @@ const handleLogin = async (e) => {
   };
 
   const handleGoogleLogin = () => {
-    // (ส่งสัญญาณ ?role=OWNER ... เพื่อให้ Backend "ฝัง" Cookie ที่ถูกต้อง)
     window.location.href = "http://localhost:3000/api/auth/login?role=OWNER";
   };
 

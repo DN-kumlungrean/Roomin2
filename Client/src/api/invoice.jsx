@@ -1,11 +1,5 @@
 import axios from 'axios'
-const API_URL = "http://localhost:3000/api/invoices"; // เปลี่ยนตาม backend ของคุณ
-
-// export const createInvoice = async(invoiceData)=> {
-//     return axios.post('http://localhost:3000/api/invoices',invoiceData,{
-
-//     })
-// }
+const API_URL = "http://localhost:3000/api/invoices";
 
 /**
  * สร้าง invoice ใหม่
@@ -19,14 +13,11 @@ export const createInvoice = async (invoiceData) => {
         "Content-Type": "application/json",
       },
     });
-    return response.data; // ส่งกลับข้อมูลจาก backend
+    return response.data;
   } catch (error) {
-    // จัดการ error ให้ชัดเจน
     if (error.response) {
-      // backend ส่ง error มา
       throw error.response.data;
     } else {
-      // network error หรืออื่น ๆ
       throw { error: error.message };
     }
   }
@@ -46,8 +37,8 @@ export const getAllInvoices = async (invoice) => {
 // สร้าง QR จาก Omise ผ่าน backend
 export const createQRPayment = async (invoiceId, amount) => {
   try {
-    const res = await axios.post(`${API_URL}/payment`, { invoiceId, amount});
-    return res.data; // จะได้ { success, qrCode, chargeId }
+    const res = await axios.post(`${API_URL}/payment`, { invoiceId, amount });
+    return res.data;
   } catch (error) {
     if (error.response) {
       throw error.response.data;

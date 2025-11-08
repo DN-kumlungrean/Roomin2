@@ -9,8 +9,8 @@ import { getInvoicesByAuthId } from "../../api/invoice";
 export default function DashboardTenant() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [bills, setBills] = useState([]);       // ✅ เก็บ invoices ทั้งหมด
-  const [totalSum, setTotalSum] = useState(0);  // ✅ เก็บยอดรวมทุกใบ
+  const [bills, setBills] = useState([]);       
+  const [totalSum, setTotalSum] = useState(0);  
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,11 +23,9 @@ export default function DashboardTenant() {
         setBills(invoiceData);
 
         const total = invoiceData
-          .filter(inv => inv.status?.name !== "Paid")  // กรองเฉพาะใบที่ยังไม่จ่าย
-          .reduce((sum, inv) => sum + (Number(inv.total) || 0), 0); // รวมยอด
+          .filter(inv => inv.status?.name !== "Paid")
+          .reduce((sum, inv) => sum + (Number(inv.total) || 0), 0); 
         setTotalSum(total);
-
-
       } catch (error) {
         console.error("Failed to load dashboard data:", error);
       } finally {
@@ -41,11 +39,11 @@ export default function DashboardTenant() {
   if (!user) return <div>Loading...</div>;
 
   // ดึงข้อมูลค่าเช่า, สถานะ, ประวัติ, การแจ้งซ่อม
-  const currentContract = user.contracts.find(c => c.isActive); // สมมติมี isActive
+  const currentContract = user.contracts.find(c => c.isActive);
   const rentThisMonth = currentContract ? currentContract.rent : 0;
   const rentStatus = currentContract ? currentContract.paymentStatus : "ไม่มีข้อมูล";
-  const repairRequests = user.repairRequests || []; // สมมติ user มี repairRequests
-  const paymentHistory = user.invoices || []; // สมมติ invoices มี month, amount, status
+  const repairRequests = user.repairRequests || [];
+  const paymentHistory = user.invoices || []; 
 
   return (
     <div className="w-full">

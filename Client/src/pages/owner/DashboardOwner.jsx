@@ -9,7 +9,7 @@ import { getAllRooms } from "../../api/room";
 import { getAdminByAuthId } from '../../api/user';
 
 export default function DashboardOwner() {
-  const [rooms, setRooms] = useState([]); // ✅ state สำหรับเก็บข้อมูลจาก DB
+  const [rooms, setRooms] = useState([]); 
   const [admin, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
